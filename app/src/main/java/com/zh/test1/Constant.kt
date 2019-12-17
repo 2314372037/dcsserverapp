@@ -8,6 +8,6 @@ class Constant {
 
         val SINA = "https://weibo.com/hzhang2314"
 
-        val GITHUB = "https://weibo.com/hzhang2314"
+        val GITHUB = "https://github.com/2314372037/dcsserverapp"
     }
 }
