@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/server_item_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:text="标题"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/server_item_ip"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/server_item_ip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="ip地址"
+        app:layout_constraintBottom_toTopOf="@+id/server_item_people_cout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/server_item_title"
+        app:layout_constraintTop_toBottomOf="@+id/server_item_title" />
+
+    <TextView
+        android:id="@+id/server_item_port"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="端口"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toBottomOf="@+id/server_item_ip"
+        app:layout_constraintEnd_toEndOf="@+id/server_item_title"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/server_item_ip"
+        app:layout_constraintTop_toTopOf="@+id/server_item_ip" />
+
+    <TextView
+        android:id="@+id/server_item_people_cout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="玩家数量"
+        android:textColor="@color/itemPsd2"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@+id/server_item_mission_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/server_item_title"
+        app:layout_constraintTop_toBottomOf="@+id/server_item_ip" />
+
+    <TextView
+        android:id="@+id/server_item_psd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="密码"
+        android:textColor="@color/itemPsd2"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@+id/server_item_people_cout"
+        app:layout_constraintStart_toEndOf="@+id/server_item_people_cout"
+        app:layout_constraintTop_toTopOf="@+id/server_item_people_cout" />
+
+    <TextView
+        android:id="@+id/server_item_mission_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="任务名称"
+        android:textColor="#344F5A"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/server_item_mission_expand"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/server_item_title"
+        app:layout_constraintTop_toBottomOf="@+id/server_item_people_cout" />
+
+    <CheckBox
+        android:id="@+id/server_item_mission_expand"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:button="@null"
+        android:drawableStart="@drawable/expand_desc"
+        android:drawableTint="@color/colorPrimary"
+        android:text="任务描述"
+        android:textColor="@color/colorPrimary"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@+id/server_item_mission_name"
+        app:layout_constraintEnd_toStartOf="@+id/server_item_share"
+        app:layout_constraintTop_toTopOf="@+id/server_item_mission_name"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <ImageView
+        android:id="@+id/server_item_share"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/ripple"
+        android:padding="5dp"
+        android:src="@drawable/ic_share"
+        app:layout_constraintBottom_toBottomOf="@+id/server_item_mission_expand"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/server_item_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="任务时间"
+        android:textSize="12sp"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toBottomOf="@+id/server_item_people_cout"
+        app:layout_constraintStart_toEndOf="@+id/server_item_psd"
+        app:layout_constraintTop_toTopOf="@+id/server_item_people_cout" />
+</androidx.constraintlayout.widget.ConstraintLayout>

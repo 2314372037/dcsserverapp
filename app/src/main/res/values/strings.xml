@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">server</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+
+    <string name="whylogin">
+        由于服务器列表数据来自于www.digitalcombatsimulator.com，获取列表数据需要登陆后的部分数据即cookie（此cookie并不是永不过期的，所以每次打开app都会重新登陆）。
+        \n此程序相当于模拟了网站登陆，并且获取服务器列表，简化了登陆官网的一系列操作 并加入一些额外小功能：例搜索服务器，服务器数据本地化。
+        \n此程序开放源代码，保证不会窃取你的用户信息（注意：登陆后用户名密码保存在本地，无法完全保证数据安全）。
+    </string>
+</resources>
