@@ -1,4 +1,4 @@
-package com.zh.test1
+package com.zh.dcsservertools
 
 import org.junit.Test
 

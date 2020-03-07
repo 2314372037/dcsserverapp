@@ -6,4 +6,7 @@
     <item android:id="@+id/menu_me"
         android:icon="@drawable/ic_action_home"
         android:title="我的服务器" />
+    <item android:id="@+id/menu_logout"
+        android:icon="@drawable/ic_action_name"
+        android:title="清除登录信息" />
 </menu>

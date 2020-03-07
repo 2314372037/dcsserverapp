@@ -1,4 +1,4 @@
-package com.zh.test1
+package com.zh.dcsservertools
 
 import com.lzy.okgo.OkGo
 import com.lzy.okgo.cache.CacheMode
@@ -22,10 +22,12 @@ class GetR {
             okHttpClient.readTimeout(10,TimeUnit.SECONDS)
             okHttpClient.sslSocketFactory(sslParams1.sSLSocketFactory, sslParams1.trustManager)
 
-            httpHeaders.put("Accept-Language","zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2")
+            httpHeaders.put("Accept-Language","zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6")
+//            httpHeaders.put("Accept-Encoding","gzip, deflate, br")
+            httpHeaders.put("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+            httpHeaders.put("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36 Edg/80.0.361.66")
+            httpHeaders.put("Content-Type","application/x-www-form-urlencoded")
             httpHeaders.put("Accept","application/json, text/javascript, */*; q=0.01")
-            httpHeaders.put("TE","Trailers")
-            httpHeaders.put("X-Requested-With","XMLHttpRequest")
 
             OkGo.getInstance()
                 .setCacheMode(CacheMode.NO_CACHE)

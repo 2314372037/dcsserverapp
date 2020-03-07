@@ -1,4 +1,4 @@
-package com.zh.test1
+package com.zh.dcsservertools
 
 import com.tencent.mmkv.MMKV
 import org.json.JSONObject
@@ -13,32 +13,17 @@ class MMKVHelper {
         val JSON_KEY_USERNAME:String = "00004"
         val JSON_KEY_PASSWORD:String = "00005"
 
-//        private val LOCAL_MYLIST_DATA_KEY:String = "00002"
-
-
         fun SaveAll(string: String){
             MMKV.defaultMMKV().putString(LOCAL_ALLLIST_DATA_KEY,string)
         }
-
-//        fun SaveMy(string: String){
-//            MMKV.defaultMMKV().putString(LOCAL_MYLIST_DATA_KEY,string)
-//        }
 
         fun GetAll() :String?{
             return MMKV.defaultMMKV().getString(LOCAL_ALLLIST_DATA_KEY,null)
         }
 
-//        fun GetMy() :String?{
-//            return MMKV.defaultMMKV().getString(LOCAL_MYLIST_DATA_KEY,null)
-//        }
-
         fun ClearAll(){
             MMKV.defaultMMKV().removeValueForKey(LOCAL_ALLLIST_DATA_KEY)
         }
-
-//        fun ClearMy(){
-//            MMKV.defaultMMKV().removeValueForKey(LOCAL_MYLIST_DATA_KEY)
-//        }
 
         /***
          * 保存用户信息
