@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:padding="15dp"
     android:orientation="vertical">
 
@@ -69,5 +69,31 @@
         app:layout_constraintStart_toStartOf="@+id/editText_password"
         app:layout_constraintTop_toBottomOf="@+id/editText_password" />
 
+    <TextView
+        android:id="@+id/loginStatusText"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toBottomOf="@+id/loginBnt"
+        app:layout_constraintEnd_toStartOf="@+id/loginBnt"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/loginBnt" />
+
+    <Button
+        android:id="@+id/loginBnt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="登录"
+        app:layout_constraintEnd_toStartOf="@+id/loginExitBtn"
+        app:layout_constraintTop_toBottomOf="@+id/SCBtn" />
+
+    <Button
+        android:id="@+id/loginExitBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="不用了"
+        app:layout_constraintEnd_toEndOf="@+id/ATMEBtn"
+        app:layout_constraintTop_toBottomOf="@+id/SCBtn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

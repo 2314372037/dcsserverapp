@@ -42,7 +42,12 @@ class MMKVHelper {
 
         fun GetUserInfo() : JSONObject?{
             return try{
-                return JSONObject(MMKV.defaultMMKV().getString(LOCAL_USER_INFO_KEY,null))
+                val json = MMKV.defaultMMKV().getString(LOCAL_USER_INFO_KEY,null)
+                if (json==null){
+                    return null
+                }else{
+                    return JSONObject(json)
+                }
             }catch (e:Exception){
                 e.printStackTrace()
                 null

@@ -37,6 +37,7 @@ import jp.wasabeef.richeditor.RichEditor
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.layout_loading.*
 import okhttp3.Headers
+import org.jetbrains.anko.find
 import org.json.JSONObject
 import java.lang.Exception
 import java.lang.reflect.Field
@@ -65,7 +66,6 @@ class MainActivity : AppCompatActivity() {
 
         RegisterListener()
         initView()
-        loadLocaleData()
     }
 
 
@@ -74,7 +74,12 @@ class MainActivity : AppCompatActivity() {
             if (islogin){
                 getServerList()
             }else{
-                login()
+                login({
+                    showtoast("登录成功")
+                    getServerList()
+                },{
+                    showtoast("登录失败")
+                })
             }
         }
 
@@ -149,6 +154,16 @@ class MainActivity : AppCompatActivity() {
             val ATMEBtn:Button = viewGroup.findViewById(R.id.ATMEBtn)
             val tips:TextView = viewGroup.findViewById(R.id.tips)
 
+            val loginStatusText = viewGroup.find<TextView>(R.id.loginStatusText)
+            val loginBnt = viewGroup.findViewById<Button>(R.id.loginBnt)
+            val loginExitBtn = viewGroup.findViewById<Button>(R.id.loginExitBtn)
+
+            alertDialog.setTitle("登陆")
+            alertDialog.setView(viewGroup)
+            alertDialog.setCancelable(false)
+            val ad = alertDialog.create()
+            ad.show()
+
             whyBtn.setOnClickListener{
                 tips.text=getString(R.string.whylogin)
             }
@@ -163,26 +178,27 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
 
-            alertDialog.setTitle("登陆")
-            alertDialog.setView(viewGroup)
-            alertDialog.setNegativeButton("登陆", DialogInterface.OnClickListener { dialog, which ->
+            loginBnt.setOnClickListener {
                 username = viewGroup.findViewById<EditText>(R.id.editText_username).text.toString()
                 password = viewGroup.findViewById<EditText>(R.id.editText_password).text.toString()
                 if (TextUtils.isEmpty(username)){
-                    Toast.makeText(this,"请输入用户名",Toast.LENGTH_LONG).show()
-                    initView()
-                    return@OnClickListener
+                    loginStatusText.text = "请输入用户名"
+                    return@setOnClickListener
                 }
                 if (TextUtils.isEmpty(password)){
-                    Toast.makeText(this,"请输入密码",Toast.LENGTH_LONG).show()
-                    initView()
-                    return@OnClickListener
+                    loginStatusText.text = "请输入密码"
+                    return@setOnClickListener
                 }
-                login()
-            })
-            alertDialog.setCancelable(false)
-            alertDialog.setPositiveButton("不用了", { dialog, which -> finish() })
-            alertDialog.show()
+                loginStatusText.text = "登录中(由于是海外服务器，可能较慢)"
+                login({
+                    ad.dismiss()
+                    showtoast("登录成功")
+                    getServerList()
+                },{
+                    loginStatusText.text = "登陆失败"
+                })
+            }
+            loginExitBtn.setOnClickListener {System.exit(0)}
             return
         } else {
             username = userinfo.getString(MMKVHelper.JSON_KEY_USERNAME)
@@ -197,6 +213,7 @@ class MainActivity : AppCompatActivity() {
                 initView()
                 return
             }
+            loadLocaleData()
         }
     }
 
@@ -211,13 +228,9 @@ class MainActivity : AppCompatActivity() {
         if (BuildConfig.DEBUG) {
             Log.d(MainActivity::class.java.simpleName, "$string")
         }
-        if (TextUtils.isEmpty(string)) {
-            login()
-        } else {
+        if (!string.isNullOrEmpty()){
             showtoast("使用本地数据")
-
             var serversBean: ServiceListBean? = null
-
             try {
                 serversBean = Gson().fromJson(string, ServiceListBean::class.java)
                 serviceListForAllAdapter =
@@ -240,20 +253,28 @@ class MainActivity : AppCompatActivity() {
                 e.printStackTrace()
                 showtoast("解析本地数据失败")
                 MMKVHelper.ClearAll()
-                login()
+                MMKVHelper.ClearUserInfo()
+                initView()
                 return
             }
 
             if (serversBean==null){
                 showtoast("解析本地数据失败")
                 MMKVHelper.ClearAll()
-                login()
+                MMKVHelper.ClearUserInfo()
+                initView()
                 return
             }
 
             ServerList.layoutManager = LinearLayoutManager(this@MainActivity)
             ServerList.adapter = serviceListForAllAdapter
-
+        }else{
+            login({
+                showtoast("登录成功")
+                getServerList()
+            },{
+                showtoast("登录失败")
+            })
         }
     }
 
@@ -261,7 +282,7 @@ class MainActivity : AppCompatActivity() {
     /***
      * 执行登陆操作，并获取登陆成功的cookie
      */
-    fun login() {
+    fun login(sucessListener:()->Unit,failListener: () -> Unit) {
         if (islogin) {
             showtoast("已经是登陆状态，如需重新登陆请重启app")
             return
@@ -279,12 +300,6 @@ class MainActivity : AppCompatActivity() {
             .params("USER_LOGIN", username)
             .params("USER_PASSWORD", password)
             .execute(object : StringConvert() {
-                override fun onStart(request: Request<String, out Request<Any, Request<*, *>>>?) {
-                    super.onStart(request)
-                    islogin = false
-                    showtoast("正在登陆")
-                }
-
                 override fun onSuccess(response: Response<String?>) {
                     super.onSuccess(response)
                     val headers: Headers = response.headers()
@@ -305,20 +320,16 @@ class MainActivity : AppCompatActivity() {
 
                     if (islogin){
                         MMKVHelper.SaveUserInfo(username, password)
-                        showtoast("登陆成功")
-                        getServerList()
+                        sucessListener.invoke()
                     }else{
                         MMKVHelper.ClearUserInfo()
-                        showtoast("登陆失败")
-                        initView()
+                        failListener.invoke()
                     }
-
                 }
 
                 override fun onError(response: Response<String>?) {
                     super.onError(response)
-                    islogin = false
-                    showtoast("登陆失败")
+                    failListener.invoke()
                 }
             })
     }
@@ -333,14 +344,13 @@ class MainActivity : AppCompatActivity() {
             return
         }
         if (login_cookie.isNullOrEmpty()){
-            showtoast("请重新登录")
-            initView()
+            showtoast("cookie为空请重新登录")
             return
         }
         if (isloading) {
             return
         }
-        val request = GetR.Get<String>(Constant.SERVER_LIST_URL + System.currentTimeMillis())
+        val request = GetR.Get<String>(Constant.SERVER_LIST_URL + System.currentTimeMillis()/1000)
 
         request.headers("Cookie",login_cookie)
 
@@ -365,17 +375,15 @@ class MainActivity : AppCompatActivity() {
                     val serversBean: ServiceListBean
 
                     try {
-                        Log.d("调试",json)
-                        serversBean = Gson().fromJson(json,
-                            ServiceListBean::class.java)
+                        serversBean = Gson().fromJson(json, ServiceListBean::class.java)
                     }catch (e:Exception){
                         e.printStackTrace()
-                        showtoast("获取服务器列表失败")
+                        showtoast("获取服务器列表失败(请尝试重新打开app)")
                         return
                     }
 
                     if (serversBean==null){
-                        showtoast("获取服务器列表失败")
+                        showtoast("获取服务器列表失败(请尝试重新打开app)")
                         return
                     }
 

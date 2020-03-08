@@ -78,7 +78,7 @@ class ServiceListForMyAdapter(
         holder.share.setOnClickListener(View.OnClickListener {
             val intent = Intent()
             intent.action = Intent.ACTION_SEND
-            intent.putExtra(Intent.EXTRA_TEXT, serviceListBean.servers?.get(position)?.iP_ADDRESS+":"+serviceListBean.servers?.get(position)?.port)
+            intent.putExtra(Intent.EXTRA_TEXT, serviceListBean.servers?.get(position)?.name+serviceListBean.servers?.get(position)?.iP_ADDRESS+":"+serviceListBean.servers?.get(position)?.port)
             intent.type = "text/plain"
             activity.startActivity(Intent.createChooser(intent,"选择分享应用"))
         })
