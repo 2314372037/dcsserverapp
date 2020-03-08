@@ -1,4 +1,4 @@
-package com.zh.dcsservertools
+package com.zh.dcsservertools.adapter
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -11,6 +11,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
+import com.zh.dcsservertools.R
+import com.zh.dcsservertools.bean.ServiceListBean
 import jp.wasabeef.richeditor.RichEditor
 import org.jetbrains.anko.textColor
 
@@ -18,8 +20,12 @@ class ServiceListForMyAdapter(
     private val activity: Activity, bean: ServiceListBean
 ) : RecyclerView.Adapter<ServiceListForMyAdapter.MyViewHolder>() , Filterable {
 
-    private var sourceServiceListBean: ServiceListBean = ServiceListBean()
-    private var serviceListBean: ServiceListBean = ServiceListBean()
+    private var sourceServiceListBean: ServiceListBean =
+        ServiceListBean()
+    private var serviceListBean: ServiceListBean =
+        ServiceListBean()
+
+    private lateinit var missionExpandListener:(buttonView:CompoundButton,isChecked:Boolean,pos:Int)->Unit
 
     init {
         sourceServiceListBean=bean
@@ -30,7 +36,13 @@ class ServiceListForMyAdapter(
         val layoutInflater: LayoutInflater =
             activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val view = layoutInflater.inflate(R.layout.server_list_item, parent, false)
-        return MyViewHolder(view)
+        return MyViewHolder(
+            view
+        )
+    }
+
+    fun setMissionExpandListener(listener:(buttonView:CompoundButton,isChecked:Boolean,pos:Int)->Unit){
+        this.missionExpandListener=listener
     }
 
     @SuppressLint("SetTextI18n")
@@ -57,21 +69,8 @@ class ServiceListForMyAdapter(
         }else{
             holder.missionExpand.visibility=View.VISIBLE
             holder.missionExpand.setOnCheckedChangeListener { buttonView, isChecked ->
-                if (isChecked){
-                    val layoutInflater: LayoutInflater =
-                        activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val viewGroup:ViewGroup=layoutInflater.inflate(R.layout.dialog_mission_desc,null) as ViewGroup
-
-                    val richEditor:RichEditor = viewGroup.findViewById<RichEditor>(R.id.mission_desc)
-                    richEditor.html=serviceListBean.mY_SERVERS?.get(position)?.description
-
-                    val alertDialog:AlertDialog.Builder=AlertDialog.Builder(activity)
-                    alertDialog.setNegativeButton("关闭",null)
-                    alertDialog.setTitle(serviceListBean.mY_SERVERS?.get(position)?.missioN_NAME)
-                    alertDialog.setView(viewGroup)
-                    alertDialog.show()
-
-                    buttonView.isChecked=false
+                if (this::missionExpandListener.isInitialized){
+                    missionExpandListener.invoke(buttonView,isChecked,position)
                 }
             }
         }
@@ -104,7 +103,7 @@ class ServiceListForMyAdapter(
         return serviceListBean.mY_SERVERS!!.size
     }
 
-    fun getData() : ServiceListBean{
+    fun getData() : ServiceListBean {
         return serviceListBean
     }
 

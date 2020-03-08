@@ -1,4 +1,4 @@
-package com.zh.dcsservertools
+package com.zh.dcsservertools.utils
 
 import com.tencent.mmkv.MMKV
 import org.json.JSONObject

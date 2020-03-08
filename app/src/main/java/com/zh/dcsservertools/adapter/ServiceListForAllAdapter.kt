@@ -1,4 +1,4 @@
-package com.zh.dcsservertools
+package com.zh.dcsservertools.adapter
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -11,6 +11,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
+import com.zh.dcsservertools.R
+import com.zh.dcsservertools.bean.ServiceListBean
+import com.zh.dcsservertools.utils.utils
 import jp.wasabeef.richeditor.RichEditor
 import org.jetbrains.anko.textColor
 
@@ -18,28 +21,46 @@ class ServiceListForAllAdapter(
     private val activity: Activity, bean: ServiceListBean
 ) : RecyclerView.Adapter<ServiceListForAllAdapter.MyViewHolder>() , Filterable {
 
-    private var sourceServiceListBean: ServiceListBean = ServiceListBean()
-    private var serviceListBean: ServiceListBean = ServiceListBean()
+    private var sourceServiceListBean: ServiceListBean =
+        ServiceListBean()
+    private var serviceListBean: ServiceListBean =
+        ServiceListBean()
+
+    private lateinit var missionExpandListener:(buttonView:CompoundButton,isChecked:Boolean,pos:Int)->Unit
 
     init {
-        sourceServiceListBean=bean
-        serviceListBean=bean
+        sourceServiceListBean=mySort(bean)
+        serviceListBean=mySort(bean)
     }
 
     /***
      * 排序 把包含汉字的排在最前面
      */
-    private fun mySort(dat:ServiceListBean):ServiceListBean{
-        //未完成
+    private fun mySort(dat: ServiceListBean): ServiceListBean {
+        val ChineseData = ServiceListBean()
+        val OtherData = ServiceListBean()
+        for (i in dat.servers){//先遍历添加中文服务器
+            if (utils.isContainChinese(i.name)|| utils.isContainChinese(i.missioN_NAME)){
+                ChineseData.servers.add(i)
+            }else{
+                OtherData.servers.add(i)
+            }
+        }
+        ChineseData.servers.addAll(OtherData.servers)
+        return ChineseData
+    }
 
-        return dat
+    fun setMissionExpandListener(listener:(buttonView:CompoundButton,isChecked:Boolean,pos:Int)->Unit){
+        this.missionExpandListener=listener
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val layoutInflater: LayoutInflater =
             activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val view = layoutInflater.inflate(R.layout.server_list_item, parent, false)
-        return MyViewHolder(view)
+        return MyViewHolder(
+            view
+        )
     }
 
     @SuppressLint("SetTextI18n")
@@ -66,21 +87,8 @@ class ServiceListForAllAdapter(
         }else{
             holder.missionExpand.visibility=View.VISIBLE
             holder.missionExpand.setOnCheckedChangeListener { buttonView, isChecked ->
-                if (isChecked){
-                    val layoutInflater: LayoutInflater =
-                        activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val viewGroup:ViewGroup=layoutInflater.inflate(R.layout.dialog_mission_desc,null) as ViewGroup
-
-                    val richEditor:RichEditor = viewGroup.findViewById<RichEditor>(R.id.mission_desc)
-                    richEditor.html=serviceListBean.servers?.get(position)?.description
-
-                    val alertDialog:AlertDialog.Builder=AlertDialog.Builder(activity)
-                    alertDialog.setNegativeButton("关闭",null)
-                    alertDialog.setTitle(serviceListBean.servers?.get(position)?.missioN_NAME)
-                    alertDialog.setView(viewGroup)
-                    alertDialog.show()
-
-                    buttonView.isChecked=false
+                if (this::missionExpandListener.isInitialized){
+                    missionExpandListener.invoke(buttonView,isChecked,position)
                 }
             }
         }
@@ -113,7 +121,7 @@ class ServiceListForAllAdapter(
         return serviceListBean.servers!!.size
     }
 
-    fun getData() : ServiceListBean{
+    fun getData() : ServiceListBean {
         return serviceListBean
     }
 

@@ -1,6 +1,7 @@
-package com.zh.dcsservertools
+package com.zh.dcsservertools.ui
 
 import android.app.Activity
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
@@ -20,22 +21,37 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
+import com.lzy.okgo.OkGo
 import com.lzy.okgo.model.Response
+import com.lzy.okgo.request.GetRequest
 import com.lzy.okgo.request.base.Request
+import com.zh.dcsservertools.BuildConfig
+import com.zh.dcsservertools.Constant
+import com.zh.dcsservertools.R
+import com.zh.dcsservertools.adapter.ServiceListForAllAdapter
+import com.zh.dcsservertools.adapter.ServiceListForMyAdapter
+import com.zh.dcsservertools.bean.ServiceListBean
+import com.zh.dcsservertools.bean.baiduTranslateBean
+import com.zh.dcsservertools.utils.*
+import jp.wasabeef.richeditor.RichEditor
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.layout_loading.*
 import okhttp3.Headers
 import org.json.JSONObject
 import java.lang.Exception
+import java.lang.reflect.Field
 
 class MainActivity : AppCompatActivity() {
 
     lateinit var serviceListForAllAdapter: ServiceListForAllAdapter
+    lateinit var serviceListForMyAdapter: ServiceListForMyAdapter
     var islogin: Boolean = false
     var isloading: Boolean = false
     var username: String = ""
     var password: String = ""
     var login_cookie: String? = ""
+
+    var server_type = 1//当前显示的服务器类型 1全部 2我的
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,14 +84,23 @@ class MainActivity : AppCompatActivity() {
 
         navigationView.setNavigationItemSelectedListener {
             when(it.itemId){
-                R.id.menu_all->{
+                R.id.menu_all ->{
+                    server_type=1
                     drawerLayout.closeDrawers()
+                    if (this::serviceListForAllAdapter.isInitialized){
+                        ServerList.layoutManager = LinearLayoutManager(this@MainActivity)
+                        ServerList.adapter = serviceListForAllAdapter
+                    }
                 }
-                R.id.menu_me->{
+                R.id.menu_me ->{
+                    server_type=2
                     drawerLayout.closeDrawers()
-                    Toast.makeText(this,"开发中",Toast.LENGTH_SHORT).show()
+                    if (this::serviceListForMyAdapter.isInitialized){
+                        ServerList.layoutManager = LinearLayoutManager(this@MainActivity)
+                        ServerList.adapter = serviceListForMyAdapter
+                    }
                 }
-                R.id.menu_logout->{
+                R.id.menu_logout ->{
                     drawerLayout.closeDrawers()
                     MMKVHelper.ClearUserInfo()
                     MMKVHelper.ClearAll()
@@ -153,8 +178,7 @@ class MainActivity : AppCompatActivity() {
                     initView()
                     return@OnClickListener
                 }
-                MMKVHelper.SaveUserInfo(username, password)
-                initView()
+                login()
             })
             alertDialog.setCancelable(false)
             alertDialog.setPositiveButton("不用了", { dialog, which -> finish() })
@@ -192,11 +216,26 @@ class MainActivity : AppCompatActivity() {
         } else {
             showtoast("使用本地数据")
 
-            var serversBean:ServiceListBean? = null
+            var serversBean: ServiceListBean? = null
 
             try {
                 serversBean = Gson().fromJson(string, ServiceListBean::class.java)
-                serviceListForAllAdapter = ServiceListForAllAdapter(this@MainActivity, serversBean)
+                serviceListForAllAdapter =
+                    ServiceListForAllAdapter(
+                        this@MainActivity,
+                        serversBean
+                    )
+                serviceListForMyAdapter =
+                    ServiceListForMyAdapter(
+                        this@MainActivity,
+                        serversBean
+                    )
+                serviceListForMyAdapter.setMissionExpandListener { buttonView, isChecked, pos ->
+                    missionexpand(buttonView, isChecked, pos)
+                }
+                serviceListForAllAdapter.setMissionExpandListener { buttonView, isChecked, pos ->
+                    missionexpand(buttonView, isChecked, pos)
+                }
             }catch (e:Exception){
                 e.printStackTrace()
                 showtoast("解析本地数据失败")
@@ -265,9 +304,11 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     if (islogin){
+                        MMKVHelper.SaveUserInfo(username, password)
                         showtoast("登陆成功")
                         getServerList()
                     }else{
+                        MMKVHelper.ClearUserInfo()
                         showtoast("登陆失败")
                         initView()
                     }
@@ -321,11 +362,12 @@ class MainActivity : AppCompatActivity() {
                     super.onSuccess(response)
                     val json = response.body()
 
-                    val serversBean:ServiceListBean
+                    val serversBean: ServiceListBean
 
                     try {
                         Log.d("调试",json)
-                        serversBean = Gson().fromJson(json,ServiceListBean::class.java)
+                        serversBean = Gson().fromJson(json,
+                            ServiceListBean::class.java)
                     }catch (e:Exception){
                         e.printStackTrace()
                         showtoast("获取服务器列表失败")
@@ -338,10 +380,29 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     serviceListForAllAdapter =
-                        ServiceListForAllAdapter(this@MainActivity, serversBean)
+                        ServiceListForAllAdapter(
+                            this@MainActivity,
+                            serversBean
+                        )
+                    serviceListForMyAdapter =
+                        ServiceListForMyAdapter(
+                            this@MainActivity,
+                            serversBean
+                        )
+                    serviceListForMyAdapter.setMissionExpandListener { buttonView, isChecked, pos ->
+                        missionexpand(buttonView, isChecked, pos)
+                    }
+                    serviceListForAllAdapter.setMissionExpandListener { buttonView, isChecked, pos ->
+                        missionexpand(buttonView, isChecked, pos)
+                    }
 
-                    ServerList.layoutManager = LinearLayoutManager(this@MainActivity)
-                    ServerList.adapter = serviceListForAllAdapter
+                    if (server_type==1){
+                        ServerList.layoutManager = LinearLayoutManager(this@MainActivity)
+                        ServerList.adapter = serviceListForAllAdapter
+                    }else{
+                        ServerList.layoutManager = LinearLayoutManager(this@MainActivity)
+                        ServerList.adapter = serviceListForMyAdapter
+                    }
 
                     MMKVHelper.SaveAll(json!!)//保存列表到本地
                 }
@@ -351,6 +412,91 @@ class MainActivity : AppCompatActivity() {
                     showtoast("请求错误:${response?.exception?.localizedMessage}")
                 }
             })
+    }
+
+
+    /***
+     * 翻译
+     */
+    private fun translate(sourceStr:String?,listener:(dst:String)->Unit,failListener:()->Unit){
+        Log.d("调试","翻译内容"+sourceStr)
+
+        val appid = Constant.baiduFanyiAppid
+        val salt = utils.getNumber(10)
+        val key = Constant.baiduFanyiAppkey
+
+        val sign = utils.stringToMD5(appid+sourceStr+salt+key)
+
+        val request: GetRequest<String> = OkGo.get(
+            "https://fanyi-api.baidu.com/api/trans/vip/translate"+"?q="+sourceStr+"&from=auto"+"&to=zh"+"&appid="+appid+"&salt="+salt+"&sign="+sign
+        )
+
+        request.execute(object : StringConvert(){
+            override fun onSuccess(response: Response<String?>) {
+                super.onSuccess(response)
+                try {
+                    val json = response.body()
+                    val ts = Gson().fromJson(json,baiduTranslateBean::class.java)
+                    if (!ts.trans_result.isNullOrEmpty()){
+                        listener.invoke(ts.trans_result?.get(0)?.dst.toString())
+                    }else{
+                        failListener.invoke()
+                    }
+                }catch (e:Exception){
+                    e.printStackTrace()
+                    failListener.invoke()
+                }
+            }
+
+            override fun onError(response: Response<String>?) {
+                super.onError(response)
+                failListener.invoke()
+            }
+        })
+
+
+    }
+
+
+    fun missionexpand(buttonView:CompoundButton,isChecked:Boolean,position:Int){
+        if (isChecked){
+            val layoutInflater: LayoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val viewGroup:ViewGroup=layoutInflater.inflate(R.layout.dialog_mission_desc,null) as ViewGroup
+
+            val richEditor: RichEditor = viewGroup.findViewById<RichEditor>(
+                R.id.mission_desc
+            )
+            richEditor.html=serviceListForAllAdapter.getData().servers.get(position).description
+
+            val alertDialog: android.app.AlertDialog.Builder= android.app.AlertDialog.Builder(this)
+            alertDialog.setNegativeButton("关闭") { dialog, which ->
+                try {
+                    val field = dialog::class.java.getSuperclass()?.getDeclaredField( "mShowing" );
+                    field?.setAccessible( true );
+                    field?.set( dialog, true ); // false - 使之不能关闭(此为机关所在，其它语句相同)
+                } catch ( e:Exception) {e.printStackTrace()}
+            }
+//            alertDialog.setPositiveButton("翻译"
+//            ) { dialog, which ->
+//                try
+//                {
+//                    val field = dialog::class.java.getSuperclass()?.getDeclaredField( "mShowing" );
+//                    field?.setAccessible( true );
+//                    field?.set( dialog, false ); // false - 使之不能关闭(此为机关所在，其它语句相同)
+//                }
+//                catch ( e:Exception)
+//                {e.printStackTrace()}
+//                translate(richEditor.html.replace("<br />","").replace("<br/>",""),{
+//                    richEditor.html=it
+//                },{
+//                    richEditor.html="翻译失败"
+//                })
+//            }
+            alertDialog.setTitle(serviceListForAllAdapter.getData().servers.get(position).missioN_NAME)
+            alertDialog.setView(viewGroup)
+            alertDialog.show()
+            buttonView.isChecked=false
+        }
     }
 
 

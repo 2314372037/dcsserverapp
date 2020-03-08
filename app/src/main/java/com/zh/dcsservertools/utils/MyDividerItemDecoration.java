@@ -1,7 +1,9 @@
-package com.zh.dcsservertools;
+package com.zh.dcsservertools.utils;
 
 import android.content.Context;
 import androidx.recyclerview.widget.DividerItemDecoration;
+
+import com.zh.dcsservertools.R;
 
 public class MyDividerItemDecoration extends DividerItemDecoration {
 

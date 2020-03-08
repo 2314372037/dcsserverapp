@@ -1,4 +1,4 @@
-package com.zh.dcsservertools;
+package com.zh.dcsservertools.bean;
 
 import java.util.ArrayList;
 import java.util.List;
