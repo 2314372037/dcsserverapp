@@ -1,6 +1,8 @@
 package com.zh.dcsservertools.ui
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -8,10 +10,7 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
-import android.widget.EditText
-import android.widget.ProgressBar
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -31,6 +30,7 @@ import com.zh.dcsservertools.ui.widget.MyWebView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.layout_loading.*
 import org.json.JSONObject
+
 
 class MainActivity : AppCompatActivity() {
     val net by lazy { NetworkHelper(this) }
@@ -164,6 +164,24 @@ class MainActivity : AppCompatActivity() {
         loginAlertDialog.setCancelable(false)
         loginAlertDialog.setTitle("请先登录:)")
         val view = LayoutInflater.from(this).inflate(R.layout.layout_dialog_login, null)
+        view.findViewById<TextView>(R.id.tvGITHUB)?.setOnClickListener {
+            //从其他浏览器打开
+            val intent = Intent()
+            intent.action = Intent.ACTION_VIEW
+            val content_url = Uri.parse(NetworkHelper.GITHUB)
+            intent.data = content_url
+            startActivity(Intent.createChooser(intent, "请选择浏览器"))
+        }
+        view.findViewById<TextView>(R.id.tvWB)?.setOnClickListener {
+            //从其他浏览器打开
+            val intent = Intent()
+            intent.action = Intent.ACTION_VIEW
+            val content_url = Uri.parse(NetworkHelper.SINA)
+            intent.data = content_url
+            startActivity(Intent.createChooser(intent, "请选择浏览器"))
+        }
+
+
         loginAlertDialog.setView(view)
         loginAlertDialog.setNegativeButton("退出") { d, i ->
             finish()
@@ -315,6 +333,31 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    /***
+     * 格式化cookie，取出必要信息
+     * 注意这里只有某些差参数是必要的
+     * 例子数据PHPSESSID=r7QZ7f7q02iaqbo6nlj3Y2Iccccc; BITRIX_SM_SALE_UID=333333; BITRIX_SM_NCC=Y; BITRIX_SM_LOGIN=22222222; BITRIX_SM_SOUND_LOGIN_PLAYED=Y; BITRIX_SM_GUEST_ID=60550448;
+    BITRIX_SM_LAST_VISIT=07.08.2020+09%3A32%3A31;
+     */
+    private fun formatCookie(cookie: String?): String {
+        var cookieStr = ""
+        try {
+            cookie?.split(";")?.let {
+                for (i in it.indices) {
+                    if (i == 0) {//
+                        if (it.get(i).contains("PHPSESSID")) {
+                            continue
+                        }
+                    }
+                    cookieStr += it.get(i) + "; "
+                }
+            }
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+
+        return cookieStr
+    }
 
     /****
      * 获取服务器列表数据
@@ -331,12 +374,13 @@ class MainActivity : AppCompatActivity() {
         if (isloading) {
             return
         }
-        Log.d("调试", "$login_cookie")
+        Log.d("调试", "格式化前cookie->$login_cookie")
+        Log.d("调试", "格式化后cookie->${formatCookie(login_cookie)}")
         isloading = true
         progressBar.visibility = View.VISIBLE
         net.response(
             NetworkHelper.SERVER_LIST_URL + System.currentTimeMillis(),
-            hashMapOf(Pair("Cookie", "$login_cookie")),
+            hashMapOf(Pair("Cookie", formatCookie(login_cookie))),
             null,
             { data, map ->
                 val serversBean: ServiceListBean
