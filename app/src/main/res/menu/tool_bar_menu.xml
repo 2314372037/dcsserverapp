@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/searchBox"
+        android:title="搜索"
+        android:icon="@drawable/ic_action_search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/itChanged"
+        android:title="我的服务器"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/itExitLogin"
+        android:title="清除登录信息"
+        app:showAsAction="never" />
+</menu>

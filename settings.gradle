@@ -1,2 +1,2 @@
 include ':app'
-rootProject.name='test1'
+rootProject.name='dcsserverapp'

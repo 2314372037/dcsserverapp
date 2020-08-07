@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <jp.wasabeef.richeditor.RichEditor
-        android:id="@+id/mission_desc"
+    <com.zh.dcsservertools.ui.widget.MyWebView
+        android:id="@+id/webView"
         android:layout_width="0dp"
         android:layout_height="300dp"
         android:background="#FFECE1"

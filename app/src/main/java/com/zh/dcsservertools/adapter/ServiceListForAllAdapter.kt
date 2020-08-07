@@ -2,7 +2,6 @@ package com.zh.dcsservertools.adapter
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.text.TextUtils
@@ -13,9 +12,7 @@ import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.zh.dcsservertools.R
 import com.zh.dcsservertools.bean.ServiceListBean
-import com.zh.dcsservertools.utils.utils
-import jp.wasabeef.richeditor.RichEditor
-import org.jetbrains.anko.textColor
+import com.zh.dcsservertools.helper.Utils
 
 class ServiceListForAllAdapter(
     private val activity: Activity, bean: ServiceListBean
@@ -40,7 +37,7 @@ class ServiceListForAllAdapter(
         val ChineseData = ServiceListBean()
         val OtherData = ServiceListBean()
         for (i in dat.servers){//先遍历添加中文服务器
-            if (utils.isContainChinese(i.name)|| utils.isContainChinese(i.missioN_NAME)){
+            if (Utils.isContainChinese(i.name)|| Utils.isContainChinese(i.missioN_NAME)){
                 ChineseData.servers.add(i)
             }else{
                 OtherData.servers.add(i)
@@ -57,7 +54,7 @@ class ServiceListForAllAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val layoutInflater: LayoutInflater =
             activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val view = layoutInflater.inflate(R.layout.server_list_item, parent, false)
+        val view = layoutInflater.inflate(R.layout.item_server, parent, false)
         return MyViewHolder(
             view
         )
@@ -77,9 +74,9 @@ class ServiceListForAllAdapter(
         holder.missionDate.text = "任务时间:${serviceListBean.servers?.get(position)?.missioN_TIME_FORMATTED}"
 
         if (serviceListBean.servers?.get(position)?.password.equals("是")) {
-            holder.password.textColor = activity.getColor(R.color.itemPsd1)
+            holder.password.setTextColor(activity.getColor(R.color.itemPsd1))
         } else {
-            holder.password.textColor = activity.getColor(R.color.itemPsd2)
+            holder.password.setTextColor(activity.getColor(R.color.itemPsd2))
         }
 
         if (TextUtils.isEmpty(serviceListBean.servers?.get(position)?.description)||serviceListBean.servers?.get(position)?.description.equals("否")){

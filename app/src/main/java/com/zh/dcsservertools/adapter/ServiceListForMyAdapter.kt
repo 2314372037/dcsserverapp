@@ -2,7 +2,6 @@ package com.zh.dcsservertools.adapter
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.text.TextUtils
@@ -13,8 +12,6 @@ import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.zh.dcsservertools.R
 import com.zh.dcsservertools.bean.ServiceListBean
-import jp.wasabeef.richeditor.RichEditor
-import org.jetbrains.anko.textColor
 
 class ServiceListForMyAdapter(
     private val activity: Activity, bean: ServiceListBean
@@ -35,7 +32,7 @@ class ServiceListForMyAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val layoutInflater: LayoutInflater =
             activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val view = layoutInflater.inflate(R.layout.server_list_item, parent, false)
+        val view = layoutInflater.inflate(R.layout.item_server, parent, false)
         return MyViewHolder(
             view
         )
@@ -59,9 +56,9 @@ class ServiceListForMyAdapter(
         holder.missionDate.text = "任务时间:${serviceListBean.mY_SERVERS?.get(position)?.missioN_TIME_FORMATTED}"
 
         if (serviceListBean.mY_SERVERS?.get(position)?.password.equals("是")) {
-            holder.password.textColor = activity.getColor(R.color.itemPsd1)
+            holder.password.setTextColor(activity.getColor(R.color.itemPsd1))
         } else {
-            holder.password.textColor = activity.getColor(R.color.itemPsd2)
+            holder.password.setTextColor(activity.getColor(R.color.itemPsd2))
         }
 
         if (TextUtils.isEmpty(serviceListBean.mY_SERVERS?.get(position)?.description)||serviceListBean.mY_SERVERS?.get(position)?.description.equals("否")){

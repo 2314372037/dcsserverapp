@@ -1,4 +1,4 @@
-package com.zh.dcsservertools.utils
+package com.zh.dcsservertools.helper
 
 import java.math.BigInteger
 import java.security.MessageDigest
@@ -7,7 +7,7 @@ import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-class utils {
+class Utils {
 
     companion object{
         /**
