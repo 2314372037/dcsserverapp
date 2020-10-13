@@ -12,9 +12,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
+        android:theme="@style/ToolbarTheme"
         app:menu="@menu/tool_bar_menu"
-        app:navigationIcon="@mipmap/ic_launcher"
-        app:title="@string/app_name"
+        app:title="游戏服务器"
         app:titleTextColor="#ffffff" />
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -24,7 +24,8 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimary">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/ServerList"

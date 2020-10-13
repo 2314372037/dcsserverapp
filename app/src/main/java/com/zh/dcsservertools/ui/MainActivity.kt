@@ -65,6 +65,8 @@ class MainActivity : AppCompatActivity() {
                             serviceListForMyAdapter?.let {
                                 ServerList.layoutManager = LinearLayoutManager(this@MainActivity)
                                 ServerList.adapter = it
+                                toolBar.title =
+                                    "游戏服务器（数量${serviceListForMyAdapter?.getData()?.mY_SERVERS?.size}）"
                             }
                         } else {
                             server_type = 1
@@ -72,6 +74,8 @@ class MainActivity : AppCompatActivity() {
                             serviceListForAllAdapter?.let {
                                 ServerList.layoutManager = LinearLayoutManager(this@MainActivity)
                                 ServerList.adapter = it
+                                toolBar.title =
+                                    "游戏服务器（数量${serviceListForAllAdapter?.getData()?.servers?.size}）"
                             }
                         }
                     }
@@ -266,11 +270,11 @@ class MainActivity : AppCompatActivity() {
                         this@MainActivity,
                         serversBean
                     )
-                serviceListForMyAdapter?.setMissionExpandListener { buttonView, isChecked, pos ->
-                    missionexpand(buttonView, isChecked, pos)
+                serviceListForMyAdapter?.setMissionExpandListener { pos ->
+                    missionexpand(pos)
                 }
-                serviceListForAllAdapter?.setMissionExpandListener { buttonView, isChecked, pos ->
-                    missionexpand(buttonView, isChecked, pos)
+                serviceListForAllAdapter?.setMissionExpandListener { pos ->
+                    missionexpand(pos)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -282,6 +286,8 @@ class MainActivity : AppCompatActivity() {
             }
             ServerList.layoutManager = LinearLayoutManager(this@MainActivity)
             ServerList.adapter = serviceListForAllAdapter
+            toolBar.title =
+                "游戏服务器（数量${serviceListForAllAdapter?.getData()?.servers?.size}）"
         }
     }
 
@@ -404,19 +410,23 @@ class MainActivity : AppCompatActivity() {
                         this@MainActivity,
                         serversBean
                     )
-                serviceListForMyAdapter?.setMissionExpandListener { buttonView, isChecked, pos ->
-                    missionexpand(buttonView, isChecked, pos)
+                serviceListForMyAdapter?.setMissionExpandListener { pos ->
+                    missionexpand(pos)
                 }
-                serviceListForAllAdapter?.setMissionExpandListener { buttonView, isChecked, pos ->
-                    missionexpand(buttonView, isChecked, pos)
+                serviceListForAllAdapter?.setMissionExpandListener { pos ->
+                    missionexpand(pos)
                 }
 
                 if (server_type == 1) {
                     ServerList.layoutManager = LinearLayoutManager(this@MainActivity)
                     ServerList.adapter = serviceListForAllAdapter
+                    toolBar.title =
+                        "游戏服务器（数量${serviceListForAllAdapter?.getData()?.servers?.size}）"
                 } else {
                     ServerList.layoutManager = LinearLayoutManager(this@MainActivity)
                     ServerList.adapter = serviceListForMyAdapter
+                    toolBar.title =
+                        "游戏服务器（数量${serviceListForAllAdapter?.getData()?.mY_SERVERS?.size}）"
                 }
 
                 MMKVHelper.SaveAll(data)//保存列表到本地
@@ -471,26 +481,25 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun missionexpand(buttonView: CompoundButton, isChecked: Boolean, position: Int) {
-        if (isChecked) {
-            val layoutInflater: LayoutInflater =
-                getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val viewGroup: ViewGroup =
-                layoutInflater.inflate(R.layout.layout_dialog_tip, null) as ViewGroup
+    fun missionexpand(position: Int) {
+        val layoutInflater: LayoutInflater =
+            getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val viewGroup: ViewGroup =
+            layoutInflater.inflate(R.layout.layout_dialog_tip, null) as ViewGroup
 
-            viewGroup.findViewById<MyWebView>(R.id.webView)
-                ?.loadData(serviceListForAllAdapter!!.getData().servers.get(position).description)
+        viewGroup.findViewById<MyWebView>(R.id.webView)
+            ?.loadData(serviceListForAllAdapter!!.getData().servers.get(position).description)
 
-            val alertDialog: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(this)
-            alertDialog.setNegativeButton("关闭") { dialog, which ->
-                try {
-                    val field = dialog::class.java.getSuperclass()?.getDeclaredField("mShowing");
-                    field?.setAccessible(true);
-                    field?.set(dialog, true); // false - 使之不能关闭(此为机关所在，其它语句相同)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+        val alertDialog: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(this)
+        alertDialog.setNegativeButton("关闭") { dialog, which ->
+            try {
+                val field = dialog::class.java.getSuperclass()?.getDeclaredField("mShowing");
+                field?.setAccessible(true);
+                field?.set(dialog, true); // false - 使之不能关闭(此为机关所在，其它语句相同)
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
+        }
 //            alertDialog.setPositiveButton("翻译"
 //            ) { dialog, which ->
 //                try
@@ -507,11 +516,9 @@ class MainActivity : AppCompatActivity() {
 //                    richEditor.html="翻译失败"
 //                })
 //            }
-            alertDialog.setTitle(serviceListForAllAdapter!!.getData().servers.get(position).missioN_NAME)
-            alertDialog.setView(viewGroup)
-            alertDialog.show()
-            buttonView.isChecked = false
-        }
+        alertDialog.setTitle(serviceListForAllAdapter!!.getData().servers.get(position).missioN_NAME)
+        alertDialog.setView(viewGroup)
+        alertDialog.show()
     }
 
 

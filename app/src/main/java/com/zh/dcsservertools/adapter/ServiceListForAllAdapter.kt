@@ -16,18 +16,18 @@ import com.zh.dcsservertools.helper.Utils
 
 class ServiceListForAllAdapter(
     private val activity: Activity, bean: ServiceListBean
-) : RecyclerView.Adapter<ServiceListForAllAdapter.MyViewHolder>() , Filterable {
+) : RecyclerView.Adapter<ServiceListForAllAdapter.MyViewHolder>(), Filterable {
 
     private var sourceServiceListBean: ServiceListBean =
         ServiceListBean()
     private var serviceListBean: ServiceListBean =
         ServiceListBean()
 
-    private lateinit var missionExpandListener:(buttonView:CompoundButton,isChecked:Boolean,pos:Int)->Unit
+    private lateinit var missionExpandListener: (pos: Int) -> Unit
 
     init {
-        sourceServiceListBean=mySort(bean)
-        serviceListBean=mySort(bean)
+        sourceServiceListBean = mySort(bean)
+        serviceListBean = mySort(bean)
     }
 
     /***
@@ -36,10 +36,10 @@ class ServiceListForAllAdapter(
     private fun mySort(dat: ServiceListBean): ServiceListBean {
         val ChineseData = ServiceListBean()
         val OtherData = ServiceListBean()
-        for (i in dat.servers){//先遍历添加中文服务器
-            if (Utils.isContainChinese(i.name)|| Utils.isContainChinese(i.missioN_NAME)){
+        for (i in dat.servers) {//先遍历添加中文服务器
+            if (Utils.isContainChinese(i.name) || Utils.isContainChinese(i.missioN_NAME)) {
                 ChineseData.servers.add(i)
-            }else{
+            } else {
                 OtherData.servers.add(i)
             }
         }
@@ -47,8 +47,8 @@ class ServiceListForAllAdapter(
         return ChineseData
     }
 
-    fun setMissionExpandListener(listener:(buttonView:CompoundButton,isChecked:Boolean,pos:Int)->Unit){
-        this.missionExpandListener=listener
+    fun setMissionExpandListener(listener: (pos: Int) -> Unit) {
+        this.missionExpandListener = listener
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -66,12 +66,15 @@ class ServiceListForAllAdapter(
         holder.ip.text = "ip地址:${serviceListBean.servers?.get(position)?.iP_ADDRESS}"
         holder.port.text = "端口:${serviceListBean.servers?.get(position)?.port}"
         holder.peopleCount.text =
-            "人数${serviceListBean.servers?.get(position)?.players}/${serviceListBean.servers?.get(
-                position
-            )?.playerS_MAX}"
+            "人数${serviceListBean.servers?.get(position)?.players}/${
+                serviceListBean.servers?.get(
+                    position
+                )?.playerS_MAX
+            }"
         holder.password.text = "密码:${serviceListBean.servers?.get(position)?.password}"
         holder.missionName.text = serviceListBean.servers?.get(position)?.missioN_NAME
-        holder.missionDate.text = "任务时间:${serviceListBean.servers?.get(position)?.missioN_TIME_FORMATTED}"
+        holder.missionDate.text =
+            "任务时间:${serviceListBean.servers?.get(position)?.missioN_TIME_FORMATTED}"
 
         if (serviceListBean.servers?.get(position)?.password.equals("是")) {
             holder.password.setTextColor(activity.getColor(R.color.itemPsd1))
@@ -79,13 +82,16 @@ class ServiceListForAllAdapter(
             holder.password.setTextColor(activity.getColor(R.color.itemPsd2))
         }
 
-        if (TextUtils.isEmpty(serviceListBean.servers?.get(position)?.description)||serviceListBean.servers?.get(position)?.description.equals("否")){
-            holder.missionExpand.visibility=View.GONE
-        }else{
-            holder.missionExpand.visibility=View.VISIBLE
-            holder.missionExpand.setOnCheckedChangeListener { buttonView, isChecked ->
-                if (this::missionExpandListener.isInitialized){
-                    missionExpandListener.invoke(buttonView,isChecked,position)
+        if (TextUtils.isEmpty(serviceListBean.servers?.get(position)?.description) || serviceListBean.servers?.get(
+                position
+            )?.description.equals("否")
+        ) {
+            holder.missionExpand.visibility = View.GONE
+        } else {
+            holder.missionExpand.visibility = View.VISIBLE
+            holder.missionExpand.setOnClickListener {
+                if (this::missionExpandListener.isInitialized) {
+                    missionExpandListener.invoke(position)
                 }
             }
         }
@@ -93,9 +99,14 @@ class ServiceListForAllAdapter(
         holder.share.setOnClickListener(View.OnClickListener {
             val intent = Intent()
             intent.action = Intent.ACTION_SEND
-            intent.putExtra(Intent.EXTRA_TEXT, serviceListBean.servers?.get(position)?.name+serviceListBean.servers?.get(position)?.iP_ADDRESS+":"+serviceListBean.servers?.get(position)?.port)
+            intent.putExtra(
+                Intent.EXTRA_TEXT,
+                serviceListBean.servers?.get(position)?.name + serviceListBean.servers?.get(position)?.iP_ADDRESS + ":" + serviceListBean.servers?.get(
+                    position
+                )?.port
+            )
             intent.type = "text/plain"
-            activity.startActivity(Intent.createChooser(intent,"选择分享应用"))
+            activity.startActivity(Intent.createChooser(intent, "选择分享应用"))
         })
 
     }
@@ -118,7 +129,7 @@ class ServiceListForAllAdapter(
         return serviceListBean.servers!!.size
     }
 
-    fun getData() : ServiceListBean {
+    fun getData(): ServiceListBean {
         return serviceListBean
     }
 
@@ -129,41 +140,41 @@ class ServiceListForAllAdapter(
         var peopleCount: TextView = itemView.findViewById(R.id.server_item_people_cout)
         var password: TextView = itemView.findViewById(R.id.server_item_psd)
         var missionName: TextView = itemView.findViewById(R.id.server_item_mission_name)
-        var missionExpand: CheckBox = itemView.findViewById(R.id.server_item_mission_expand)
-        var missionDate:TextView = itemView.findViewById(R.id.server_item_date)
-        var share:ImageView = itemView.findViewById(R.id.server_item_share)
+        var missionExpand: TextView = itemView.findViewById(R.id.server_item_mission_expand)
+        var missionDate: TextView = itemView.findViewById(R.id.server_item_date)
+        var share: ImageView = itemView.findViewById(R.id.server_item_share)
     }
 
     override fun getFilter(): Filter {
-        return object : Filter(){
+        return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 val s = constraint.toString()
-                if (s.isEmpty()){
-                    serviceListBean=sourceServiceListBean
-                }else{
+                if (s.isEmpty()) {
+                    serviceListBean = sourceServiceListBean
+                } else {
                     val tmp = ServiceListBean()
-                    for (i in sourceServiceListBean.servers){
-                        if (i.name!=null){
-                            if (i.name.contains(s)){
+                    for (i in sourceServiceListBean.servers) {
+                        if (i.name != null) {
+                            if (i.name.contains(s)) {
                                 tmp.servers.add(i)
                             }
                         }
-                        if (i.iP_ADDRESS!=null){
-                            if (i.iP_ADDRESS.contains(s)){
+                        if (i.iP_ADDRESS != null) {
+                            if (i.iP_ADDRESS.contains(s)) {
                                 tmp.servers.add(i)
                             }
                         }
                     }
-                    serviceListBean=tmp
+                    serviceListBean = tmp
                 }
 
                 val filterResults = FilterResults()
-                filterResults.values=serviceListBean
+                filterResults.values = serviceListBean
                 return filterResults
             }
 
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-                if (results?.values!= null){
+                if (results?.values != null) {
                     serviceListBean = results.values as ServiceListBean
                     notifyDataSetChanged()
                 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorPrimary">#2E2F34</color>
+    <color name="colorPrimaryDark">#2E2F34</color>
+    <color name="colorAccent">#C3265C</color>
 
     <color name="btn">#439E70</color>
 
@@ -13,11 +13,7 @@
 
     <color name="itemDe">#12000000</color>
 
-
     <color name="itemPsd1">#E65353</color>
     <color name="itemPsd2">#439B3D</color>
-
-    <color name="line">#C5C5C5</color>
-
 
 </resources>

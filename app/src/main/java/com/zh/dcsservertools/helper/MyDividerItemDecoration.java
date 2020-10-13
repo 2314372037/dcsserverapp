@@ -9,7 +9,7 @@ public class MyDividerItemDecoration extends DividerItemDecoration {
 
     public MyDividerItemDecoration(Context context, int orientation) {
         super(context, orientation);
-        setDrawable(context.getDrawable(R.color.line));
+        setDrawable(context.getDrawable(R.drawable.item_decoration));
     }
 
 }
