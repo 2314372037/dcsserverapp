@@ -2,6 +2,7 @@ package com.zh.dcsservertools.ui
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
@@ -136,6 +137,19 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
         })
+
+        try {
+            //反射获取SearchAutoComplete mSearchSrcTextView，修改TextHint颜色
+            val tmpClass = searchView::class.java
+            val tmpField = tmpClass.getDeclaredField("mSearchSrcTextView")
+            tmpField.isAccessible = true//设置可访问
+            val tmpObj = tmpField.get(tmpClass)
+            if (tmpObj is SearchView.SearchAutoComplete) {
+                tmpObj.setHintTextColor(Color.WHITE)
+            }
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun initAdapter() {
