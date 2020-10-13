@@ -143,8 +143,9 @@ class MainActivity : AppCompatActivity() {
             val tmpClass = searchView::class.java
             val tmpField = tmpClass.getDeclaredField("mSearchSrcTextView")
             tmpField.isAccessible = true//设置可访问
-            val tmpObj = tmpField.get(tmpClass)
+            val tmpObj = tmpField.get(searchView)
             if (tmpObj is SearchView.SearchAutoComplete) {
+                tmpObj.setTextColor(Color.WHITE)
                 tmpObj.setHintTextColor(Color.WHITE)
             }
         } catch (e: java.lang.Exception) {
